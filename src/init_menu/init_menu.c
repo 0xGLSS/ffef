@@ -13,7 +13,7 @@ void initMenu(struct User *u)
         login(u);
         break;
         case 2:
-        //Register(&currentUser);
+        Register(u);
         break;
         case 3:
         exit(0);

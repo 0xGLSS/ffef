@@ -4,6 +4,10 @@
         "stdio.h": "c",
         "stdlib.h": "c",
         "string.h": "c",
-        "init_menu.h": "c"
+        "init_menu.h": "c",
+        "main_menu.h": "c",
+        "unistd.h": "c",
+        "ioctl.h": "c",
+        "termios.h": "c"
     }
 }
