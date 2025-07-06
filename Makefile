@@ -8,4 +8,4 @@ bin/%.o: src/%.c
 	cc -c $< -o $@
 
 clean:
-	rm -rf bin atm
+	rm -rf bin atm records.tmp
