@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
+extern int MAX_INPUT_LEN;
+extern const char *USERS;
+extern const char *RECORDS;
+extern struct User u;
 
 struct Date
 {
@@ -29,11 +35,8 @@ struct User
     char password[30];
 };
 
-extern const char *RECORDS;
-
-void createNewAcc(struct User u);
 void mainMenu(struct User u);
-void checkAllAccounts(struct User u);
-int getAccountFromFile(FILE *ptr, char name[50], struct Record *r);
 void initMenu(struct User *u);
 int menuSelect(const char *title, char *options[], int n_options);
+void menuInput(const char *title, const char *fields[], char (*inputs)[MAX_INPUT_LEN + 1], int n);
+

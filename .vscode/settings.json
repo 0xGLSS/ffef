@@ -8,6 +8,8 @@
         "main_menu.h": "c",
         "unistd.h": "c",
         "ioctl.h": "c",
-        "termios.h": "c"
+        "termios.h": "c",
+        "typeinfo": "c",
+        "cstdio": "c"
     }
 }

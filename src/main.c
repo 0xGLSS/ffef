@@ -1,76 +1,85 @@
 #include "header.h"
 #include "init_menu/init_menu.h"
 
-const char *RECORDS = "./data/records.txt";
 struct User u;
 #define MAX_INPUT_LEN 100
+const char *RECORDS = "./data/records.txt";
+const char *USERS = "./data/users.txt";
 
 int menuSelect(const char *title, char *options[], int n_options)
 {
+    system("clear");
     printf("\n=== %s ===\n", title);
-    for (int i = 0; i < n_options; i++) {
+    for (int i = 0; i < n_options; i++)
         printf("[%d] %s\n", i + 1, options[i]);
-    }
+
     int choice = 0;
-    do {
+    do
+    {
         printf("Select option (1-%d): ", n_options);
-        scanf("%d", &choice);
-        while (getchar() != '\n'); // clear stdin
+        if (scanf("%d", &choice) != 1)
+        {
+            while (getchar() != '\n'); // clear input buffer
+            choice = 0;
+        }
     } while (choice < 1 || choice > n_options);
+
     return choice;
 }
 
-void menuInput(const char *title,
-               const char *fields[],
-               char inputs[][MAX_INPUT_LEN+1],
-               int n)
+int menuSelectById(const char *title, int options[], int n_options)
 {
+    int choice;
+    int found;
+
+    system("clear");
     printf("\n=== %s ===\n", title);
-    for (int i = 0; i < n; i++) {
-        printf("%s: ", fields[i]);
-        fgets(inputs[i], MAX_INPUT_LEN + 1, stdin);
-        // Remove trailing newline
-        size_t len = strlen(inputs[i]);
-        if (len > 0 && inputs[i][len - 1] == '\n') {
-            inputs[i][len - 1] = '\0';
+
+    printf("You have access to these IDs: [");
+    for (int i = 0; i < n_options; i++)
+        printf("%d%s", options[i], (i == n_options - 1) ? "" : ", ");
+    printf("]\n");
+
+    while (1)
+    {
+        printf("Select an ID: ");
+        if (scanf("%d", &choice) != 1)
+        {
+            while (getchar() != '\n');
+            printf("Invalid input! Please enter a number.\n");
+            continue;
         }
+
+        found = 0;
+        for (int i = 0; i < n_options; i++)
+        {
+            if (options[i] == choice)
+            {
+                found = 1;
+                break;
+            }
+        }
+
+        if (found)
+            return choice;
+
+        printf("ID not found! Please enter a valid ID.\n");
     }
 }
 
-/*
-void menuInput(const char *title,
-               const char *fields[],
-               char inputs[][MAX_INPUT_LEN+1],
-               int n,
-               int authenticated)
+void menuInput(const char *title, const char *fields[], char inputs[][MAX_INPUT_LEN + 1], int n)
 {
+    system("clear");
     printf("\n=== %s ===\n", title);
-    for (int i = 0; i < n; i++) {
+
+    for (int i = 0; i < n; i++)
+    {
         printf("%s: ", fields[i]);
         fgets(inputs[i], MAX_INPUT_LEN + 1, stdin);
-        // Remove trailing newline
-        size_t len = strlen(inputs[i]);
-        if (len > 0 && inputs[i][len - 1] == '\n') {
-            inputs[i][len - 1] = '\0';
-        }
-    }
-    printf("[1] Submit\n");
-    if (authenticated == 2) {
-        printf("[2] Menu\n");
-    }
-    int choice = 1;
-    if (authenticated == 2) {
-        printf("Choose option: ");
-        scanf("%d", &choice);
-        while (getchar() != '\n'); // clear stdin
-        if (choice == 2) {
-            mainMenu(u);
-            return;
-        }
+
+        inputs[i][strcspn(inputs[i], "\n")] = '\0';
     }
 }
-
-*/
 
 int main()
 {

@@ -1,8 +1,8 @@
 #include "../header.h"
+#include "main_menu.h"
 
 void mainMenu(struct User u)
 {
-    int option;
     system("clear");
 
     char title[] = "ATM";
@@ -25,33 +25,28 @@ void mainMenu(struct User u)
         createNewAcc(u);
         break;
     case 2:
-        updateAcc();
-        // student TODO : add your **Update account information** function
-        // here
+        updateAcc(u);
         break;
     case 3:
-        // student TODO : add your **Check the details of existing accounts** function
-        // here
+        checkAcc(u);
         break;
     case 4:
         checkAllAccounts(u);
         break;
     case 5:
-        // student TODO : add your **Make transaction** function
-        // here
+        makeTransaction(u);
         break;
     case 6:
-        // student TODO : add your **Remove existing account** function
-        // here
+        removeAcc(u);
         break;
     case 7:
-        // student TODO : add your **Transfer owner** function
-        // here
+        transferOwner(u);
         break;
     case 8:
         exit(1);
         break;
-    default:
-        printf("Invalid operation!\n");
     }
+    
+    sleep(2);
+    mainMenu(u);
 };

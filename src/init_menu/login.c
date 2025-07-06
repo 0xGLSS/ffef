@@ -5,56 +5,54 @@
 #include <string.h>
 #include <unistd.h>
 
-char *USERS = "./data/users.txt";
-int MAX_INPUT_LOG = 100;
-
-void loginMenu(struct User *u) {
+void loginMenu(struct User *u)
+{
     printf("=== Login ===\n");
-    
+
     printf("Username: ");
-    fgets(u->name, MAX_INPUT_LOG, stdin);
-    u->name[strcspn(u->name, "\n")] = 0;  // remove newline
-    
+    scanf("%29s", u->name);
+
     printf("Password: ");
-    fgets(u->password, MAX_INPUT_LOG, stdin);
-    u->password[strcspn(u->password, "\n")] = 0;  // remove newline
+    scanf("%29s", u->password);
 }
 
-char *getPassword(struct User *u) {
+int getPassword(struct User *u)
+{
     FILE *fp = fopen(USERS, "r");
-    if (!fp) {
-        return NULL;
+    if (!fp)
+    {
+        return -1;
     }
-    
+
     struct User userFromFile;
-    while (fscanf(fp, "%d %s %s", &userFromFile.id, userFromFile.name, userFromFile.password) != EOF) {
-        if (strcmp(userFromFile.name, u->name) == 0) {
-            u->id = userFromFile.id;  // set user ID from file
+    while (fscanf(fp, "%d %s %s", &userFromFile.id, userFromFile.name, userFromFile.password) != EOF)
+    {
+        if (strcmp(userFromFile.name, u->name) == 0 && strcmp(userFromFile.password, u->password) == 0)
+        {
+            u->id = userFromFile.id;
             fclose(fp);
-            return strdup(userFromFile.password);  // caller must free this!
+            return 0;
         }
     }
-    
+
     fclose(fp);
-    return NULL;
+    return -1;
 }
 
-
-void login(struct User *u) {
-    while (1) {
+void Login(struct User *u)
+{
+    while (1)
+    {
         loginMenu(u);
-
-        char *stored_password = getPassword(u);
-        if (!stored_password || strcmp(u->password, stored_password) != 0) {
+        if (getPassword(u) != 0)
+        {
             printf("Wrong password or User Name! Try again.\n");
-            free(stored_password);
             sleep(1);
-            system("clear");  // You can remove this if you don't want to clear screen
+            system("clear");
         } else {
             printf("Login successful!\n");
-            free(stored_password);
             sleep(1);
-            break;  // success
+            break;
         }
     }
 }

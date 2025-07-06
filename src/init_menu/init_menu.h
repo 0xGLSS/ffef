@@ -1,3 +1,4 @@
-void login(struct User *u);
+struct User;
+void Login(struct User *u);
 void loginMenu(struct User *u);
-extern const char *USERS;
+void Register(struct User *u);

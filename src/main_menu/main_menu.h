@@ -1,1 +1,18 @@
 void success(struct User u);
+int getOwnedIds(struct User u, int accountNbrs[]);
+void updateCountryAndPhone(struct Record *r);
+void Withdraw(struct Record *r);
+void Deposit(struct Record *r);
+void applyModification(struct User u, int accountNbr, void (*modifier)(struct Record *r));
+int validateInput(struct Record r);
+int getInfoFromId(struct User u, int accountNbr, struct Record *result);
+void displayInfo(struct User u, int accountNbr);
+void calcInterest(struct Record r);
+void checkAllAccounts(struct User u);
+int getAccountFromFile(FILE *ptr, char name[30], struct Record *r);
+void createNewAcc(struct User u);
+void updateAcc(struct User u);
+void checkAcc(struct User u);
+void makeTransaction(struct User u);
+void transferOwner(struct User u);
+void removeAcc(struct User u);
