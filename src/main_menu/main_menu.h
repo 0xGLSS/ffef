@@ -16,3 +16,4 @@ void checkAcc(struct User u);
 void makeTransaction(struct User u);
 void transferOwner(struct User u);
 void removeAcc(struct User u);
+int menuSelectById(const char *title, int options[], int n_options);

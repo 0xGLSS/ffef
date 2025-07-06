@@ -27,13 +27,8 @@ void deleteAccount(struct User u, int accountNbr)
 
         if (n == 11 && strcmp(userName, u.name) == 0 && r.accountNbr == accountNbr)
         {
-            char confirm[4];
-            printf("Delete account %d? (yes/no): ", accountNbr);
-            if (fgets(confirm, sizeof(confirm), stdin) && strncmp(confirm, "yes", 3) == 0)
-            {
-                fgets(line, sizeof(line), in);
-                continue;
-            }
+            fgets(line, sizeof(line), in);
+            continue;
         }
 
         fputs(line, out);
@@ -56,6 +51,10 @@ void removeAcc(struct User u)
     if (count == 0)
     {
         printf("No accounts to remove.\n");
+
+        printf("\nPress enter to return\n");
+        clear();
+        getchar();
         return;
     }
 
@@ -67,12 +66,18 @@ void removeAcc(struct User u)
         sprintf(options[i], "%d", accountNbrs[i]);
     }
 
-    int choice = menuSelect("Choose Account", options, count);
-    int selectedNbr = accountNbrs[choice - 1];
+    int selectedNbr = menuSelectById("Choose Account", accountNbrs, count);
+
+    for (int i = 0; i < count; i++)
+        free(options[i]);
 
     struct Record r;
 
     getInfoFromId(u, selectedNbr, &r);
 
     deleteAccount(u, selectedNbr);
+
+    printf("\nPress enter to return\n");
+    clear();
+    getchar();
 }

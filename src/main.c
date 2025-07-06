@@ -63,7 +63,7 @@ int menuSelectById(const char *title, int options[], int n_options)
         if (found)
             return choice;
 
-        printf("ID not found! Please enter a valid ID.\n");
+        printf("ID not found! This account does not exist.\n");
     }
 }
 

@@ -9,6 +9,9 @@ void checkAcc(struct User u)
     if (count == 0)
     {
         printf("No accounts to display.\n");
+        printf("\nPress enter to return\n");
+        clear();
+        getchar();
         return;
     }
 
@@ -21,9 +24,11 @@ void checkAcc(struct User u)
     }
 
     char title[] = "Choose Account";
-    int choice = menuSelect(title, options, count);
 
-    int selectedNbr = accountNbrs[choice - 1];
+    int selectedNbr = menuSelectById("Update Account Information", accountNbrs, count);
+
+    for (int i = 0; i < count; i++)
+        free(options[i]);
 
     displayInfo(u, selectedNbr);
 }
@@ -42,9 +47,12 @@ void displayInfo(struct User u, int accountNbr)
         printf("Amount: %.2lf\n", r.amount);
         printf("Account Type: %s\n\n", r.accountType);
         calcInterest(r);
+
+        printf("\nPress enter to return\n");
+        clear();
+        getchar();
     }
 }
-
 
 int getInfoFromId(struct User u, int accountNbr, struct Record *result)
 {
@@ -52,7 +60,7 @@ int getInfoFromId(struct User u, int accountNbr, struct Record *result)
     if (!in)
     {
         printf("Error opening records file.\n");
-        return 0; 
+        return 0;
     }
 
     char line[512];
@@ -79,7 +87,6 @@ int getInfoFromId(struct User u, int accountNbr, struct Record *result)
     fclose(in);
     return found;
 }
-
 
 void calcInterest(struct Record r)
 {

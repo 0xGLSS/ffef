@@ -2,6 +2,8 @@
 #include "main_menu.h"
 #include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 bool hasPrefix(const char *str, const char *prefix)
 {
@@ -17,31 +19,37 @@ void makeTransaction(struct User u)
     if (count == 0)
     {
         printf("No accounts to make transactions.\n");
+        printf("\nPress enter to return\n");
+        clear();
+        getchar();
         return;
     }
 
     char *options[100];
-
     for (int i = 0; i < count; i++)
     {
         options[i] = malloc(20);
         sprintf(options[i], "%d", accountNbrs[i]);
     }
 
-    int choice = menuSelect("Choose Account", options, count);
-    int selectedNbr = accountNbrs[choice - 1];
+    int selectedNbr = menuSelectById("Choose Account", accountNbrs, count);
+
+    for (int i = 0; i < count; i++)
+        free(options[i]);
 
     struct Record r;
-
     getInfoFromId(u, selectedNbr, &r);
 
     if (hasPrefix(r.accountType, "fixed"))
     {
         printf("Transactions are not allowed on fixed accounts.\n");
+        printf("\nPress enter to return\n");
+        clear();
+        getchar();
         return;
     }
 
-    choice = menuSelect("Transaction Type", (char *[]){"Deposit", "Withdrawal"}, 2);
+    int choice = menuSelect("Transaction Type", (char *[]){"Deposit", "Withdrawal"}, 2);
 
     switch (choice)
     {
@@ -51,7 +59,14 @@ void makeTransaction(struct User u)
     case 2:
         applyModification(u, selectedNbr, Withdraw);
         break;
+    default:
+        printf("Invalid selection.\n");
+        break;
     }
+
+    printf("\nPress enter to return\n");
+    clear();
+    getchar();
 }
 
 void Withdraw(struct Record *r)
@@ -63,14 +78,12 @@ void Withdraw(struct Record *r)
     {
         printf("Withdraw: ");
         int res = scanf("%lf", &amount);
-        getchar(); // consume leftover newline
+        getchar(); // Consume newline
 
-        // Check if input is valid and balance is sufficient
         if (res == 1 && amount > 0 && amount <= r->amount)
         {
-            r->amount -= amount; // Apply the withdrawal
+            r->amount -= amount;
             printf("Withdrawal successful. New balance: %.2lf\n", r->amount);
-            sleep(1);
             break;
         }
 
@@ -87,14 +100,12 @@ void Deposit(struct Record *r)
     {
         printf("Deposit: ");
         int res = scanf("%lf", &amount);
-        getchar(); // consume leftover newline
+        getchar(); // Consume newline
 
-        // Check if input is valid and balance is sufficient
         if (res == 1 && amount > 0 && amount < 999999999)
         {
-            r->amount += amount; // Apply the deposit
+            r->amount += amount;
             printf("Deposit successful. New balance: %.2lf\n", r->amount);
-            sleep(1);
             break;
         }
 

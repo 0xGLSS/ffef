@@ -39,4 +39,4 @@ void mainMenu(struct User u);
 void initMenu(struct User *u);
 int menuSelect(const char *title, char *options[], int n_options);
 void menuInput(const char *title, const char *fields[], char (*inputs)[MAX_INPUT_LEN + 1], int n);
-
+void clear();

@@ -6,12 +6,15 @@
 
 void updateAcc(struct User u)
 {
-    int accountNbrs[100]; 
+    int accountNbrs[100];
     int count = getOwnedIds(u, accountNbrs);
 
     if (count == 0)
     {
         printf("No accounts to update.\n");
+        printf("\nPress enter to return\n");
+        clear();
+        getchar();
         return;
     }
 
@@ -27,7 +30,9 @@ void updateAcc(struct User u)
 
     int selectedNbr = menuSelectById("Update Account Information", accountNbrs, count);
 
-    // Call the reusable function with the custom modifier
+    for (int i = 0; i < count; i++)
+        free(options[i]);
+
     applyModification(u, selectedNbr, updateCountryAndPhone);
 }
 
@@ -35,7 +40,7 @@ int getOwnedIds(struct User u, int accountNbrs[])
 {
     char userName[30];
     struct Record r;
-    int maxNbrs = 100; 
+    int maxNbrs = 100;
 
     FILE *pf = fopen(RECORDS, "r");
     if (!pf)
@@ -57,7 +62,7 @@ int getOwnedIds(struct User u, int accountNbrs[])
         }
     }
     fclose(pf);
-    return count; 
+    return count;
 }
 
 void updateCountryAndPhone(struct Record *r)
@@ -70,9 +75,12 @@ void updateCountryAndPhone(struct Record *r)
         printf("New Country: ");
         scanf("%s", r->country);
 
-        if (validateInput(*r)) {
+        if (validateInput(*r))
+        {
             break;
-        } else {
+        }
+        else
+        {
             printf("Invalid country! Please try again.\n");
         }
     }
@@ -82,9 +90,12 @@ void updateCountryAndPhone(struct Record *r)
         printf("New Phone: ");
         scanf("%s", r->phone);
 
-        if (validateInput(*r)) {
+        if (validateInput(*r))
+        {
             break;
-        } else {
+        }
+        else
+        {
             printf("Invalid phone number! Please try again.\n");
         }
     }
@@ -101,8 +112,10 @@ void applyModification(struct User u, int accountNbr, void (*modifier)(struct Re
     if (!in || !out)
     {
         perror("Error opening file");
-        if (in) fclose(in);
-        if (out) fclose(out);
+        if (in)
+            fclose(in);
+        if (out)
+            fclose(out);
         return;
     }
 
@@ -128,7 +141,6 @@ void applyModification(struct User u, int accountNbr, void (*modifier)(struct Re
                      r.id, r.userId, userName, r.accountNbr,
                      r.deposit.month, r.deposit.day, r.deposit.year,
                      r.country, r.phone, r.amount, r.accountType);
-
         }
 
         fputs(line, out);

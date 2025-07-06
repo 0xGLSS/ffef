@@ -24,18 +24,27 @@ int validateName(const char *name)
     FILE *file = fopen(USERS, "r");
     if (!file)
         return -1;
-        
-    rewind(file);
-    char username[30];
 
-    while (fscanf(file, "%*d %29s %*s", username) != EOF)
+    char username[30], password[30];
+    int id, res;
+
+    while ((res = fscanf(file, "%d %29s %29s", &id, username, password)) != EOF)
     {
+        if (res != 3)
+        {
+            printf("Corrupted user file.\n");
+            fclose(file);
+            exit(1);
+        }
+
         if (strcmp(username, name) == 0)
         {
+            fclose(file);
             return -1;
         }
     }
 
+    fclose(file);
     return 0;
 }
 

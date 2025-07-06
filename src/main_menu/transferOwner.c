@@ -25,21 +25,60 @@ int userExists(const char *username)
 
 void changeUsername(char *newOwner)
 {
-    printf("Which user to transfer to (username) ?: ");
-    scanf("%s", newOwner);
-
-    if (!userExists(newOwner))
+    while (1)
     {
-        printf("This account does not exist.\n");
-        sleep(2);
-        newOwner[0] = '\0'; // Mark as invalid
-        return;
-    }
+        printf("Which user to transfer to (username) ?: ");
+        scanf("%s", newOwner);
 
-    printf("Owner name changed successfully to: %s\n", newOwner);
-    sleep(2);
+        if (newOwner[0] == '\0')
+        {
+            printf("Operation cancelled.\n");
+            break;
+        }
+
+        if (!userExists(newOwner))
+        {
+            printf("This account does not exist.\nPress enter to return\n");
+            clear();
+            getchar();
+            continue;
+        }
+        if (strcmp(newOwner, u.name) == 0)
+        {
+            printf("You cant transfer to yourself\nPress enter to return\n");
+            clear();
+            getchar();
+            continue;
+        }
+
+        printf("Successfully Transfered ownership to: %s\nPress enter to return\n", newOwner);
+
+        break;
+    }
 }
 
+int getIdFromUser(char *name)
+{
+    FILE *pf = fopen(USERS, "r");
+    if (!pf)
+    {
+        printf("Error opening user file.\n");
+        return -1;
+    }
+
+    struct User u;
+    while (fscanf(pf, "%d %s %*s", &u.id, u.name) == 2)
+    {
+        if (strcmp(u.name, name) == 0)
+        {
+            fclose(pf);
+            return u.id;
+        }
+    }
+
+    fclose(pf);
+    return -1;
+}
 
 void changeOwner(struct User u, int accountNbr)
 {
@@ -51,14 +90,9 @@ void changeOwner(struct User u, int accountNbr)
     FILE *out = fopen(tempPath, "w");
     if (!in || !out)
     {
-        if (in)
-            fclose(in);
-        if (out)
-            fclose(out);
+        fclose(in), fclose(out);
         return;
     }
-
-    int found = 0;
 
     while (fgets(line, sizeof(line), in))
     {
@@ -70,15 +104,17 @@ void changeOwner(struct User u, int accountNbr)
                             &r.deposit.month, &r.deposit.day, &r.deposit.year,
                             r.country, r.phone, &r.amount, r.accountType);
 
-        if (parsed == 11 && strcmp(userName, u.name) == 0 && r.accountNbr == accountNbr && !found)
+        if (parsed == 11 && strcmp(userName, u.name) == 0 && r.accountNbr == accountNbr)
         {
             char newOwner[30];
             changeUsername(newOwner);
+            int id = getIdFromUser(newOwner);
+            r.userId = id;
+
             if (strlen(newOwner) == 0)
             {
                 // Invalid transfer, write the original line and skip
                 fputs(line, out);
-                found = 1;
                 continue;
             }
 
@@ -87,8 +123,6 @@ void changeOwner(struct User u, int accountNbr)
                      r.id, r.userId, newOwner, r.accountNbr,
                      r.deposit.month, r.deposit.day, r.deposit.year,
                      r.country, r.phone, r.amount, r.accountType);
-
-            found = 1;
         }
 
         fputs(line, out);
@@ -97,25 +131,14 @@ void changeOwner(struct User u, int accountNbr)
     fclose(in);
     fclose(out);
 
-    if (found)
+    if (remove(origPath) != 0 || rename(tempPath, origPath) != 0)
     {
-        if (remove(origPath) != 0 || rename(tempPath, origPath) != 0)
-        {
-            perror("Error replacing records file");
-        }
-        else
-        {
-            printf("Ownership transferred successfully.\n");
-            success(u);
-        }
+        perror("Error replacing records file");
     }
-    else
-    {
-        printf("Account not found.\n");
-        remove(tempPath); // Optional cleanup
-    }
+    remove(tempPath);
+    clear();
+    getchar();
 }
-
 
 void transferOwner(struct User u)
 {
@@ -125,6 +148,9 @@ void transferOwner(struct User u)
     if (count == 0)
     {
         printf("No accounts to transfer.\n");
+        printf("\nPress enter to return\n");
+        clear();
+        getchar();
         return;
     }
 
@@ -136,16 +162,14 @@ void transferOwner(struct User u)
         sprintf(options[i], "%d", accountNbrs[i]);
     }
 
-    int choice = menuSelect("Choose Account to Transfer", options, count);
-    int selectedNbr = accountNbrs[choice - 1];
+    int selectedNbr = menuSelectById("Choose Account to Transfer", accountNbrs, count);
+
+    for (int i = 0; i < count; i++)
+        free(options[i]);
 
     struct Record r;
 
-    if (!getInfoFromId(u, selectedNbr, &r))
-    {
-        printf("Account not found.\n");
-        return;
-    }
+    getInfoFromId(u, selectedNbr, &r);
 
     printf("Account Number: %d\n", r.accountNbr);
     printf("Deposit Date: %02d/%02d/%04d\n", r.deposit.month, r.deposit.day, r.deposit.year);

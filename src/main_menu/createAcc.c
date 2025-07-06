@@ -11,18 +11,28 @@
 
 int getAccountFromFile(FILE *ptr, char name[30], struct Record *r)
 {
-    return fscanf(ptr, "%d %d %s %d %d/%d/%d %s %s %lf %s",
-                  &r->id,
-                  &r->userId,
-                  name,
-                  &r->accountNbr,
-                  &r->deposit.month,
-                  &r->deposit.day,
-                  &r->deposit.year,
-                  r->country,
-                  r->phone,
-                  &r->amount,
-                  r->accountType) != EOF;
+    int readCount = fscanf(ptr, "%d %d %s %d %d/%d/%d %s %s %lf %s",
+                           &r->id,
+                           &r->userId,
+                           name,
+                           &r->accountNbr,
+                           &r->deposit.month,
+                           &r->deposit.day,
+                           &r->deposit.year,
+                           r->country,
+                           r->phone,
+                           &r->amount,
+                           r->accountType);
+
+    if (readCount == 11)
+        return 1;
+
+    if (readCount == EOF)
+        return 0;
+
+    printf("Corrupted records file\n");
+    fclose(ptr);
+    exit(1);
 }
 
 void saveRecord(struct User u, struct Record r)
@@ -102,7 +112,7 @@ int validateInput(struct Record r)
     }
 
     // Account number
-    if (r.accountNbr <= 0 || r.accountNbr > 999999999999999)
+    if (r.accountNbr < 0 || r.accountNbr > 999999999999999)
     {
         printf("Invalid account number!\n");
         valid = 0;
@@ -152,6 +162,7 @@ int validateInput(struct Record r)
 
     // Account type
     if (!(strcmp(r.accountType, "savings") == 0 ||
+          strcmp(r.accountType, "saving") == 0 ||
           strcmp(r.accountType, "current") == 0 ||
           strcmp(r.accountType, "fixed01") == 0 ||
           strcmp(r.accountType, "fixed02") == 0 ||
@@ -186,7 +197,7 @@ int accountExistsForUser(const char *userName, int accountNbr)
     }
 
     fclose(pf);
-    return 0; 
+    return 0;
 }
 
 int getNextRecordId()
@@ -221,10 +232,11 @@ void createNewAcc(struct User u)
         "Country",
         "Phone number",
         "Amount to deposit",
-        "Type of account (savings/current/fixed01/fixed02/fixed03)"};
+        "Type of account (saving(s)/current/fixed01/fixed02/fixed03)"};
 
     while (1)
     {
+        clear();
         menuInput("New Account Creation", fields, inputs, 6);
 
         // Parse all inputs into r
@@ -244,8 +256,8 @@ void createNewAcc(struct User u)
 
         if (!validateInput(r))
         {
-            printf("\n");
-            printf("Please fix the errors above.\n");
+            printf("\nPress enter to retry.\n");
+            clear();
             getchar();
             continue;
         }
@@ -253,14 +265,17 @@ void createNewAcc(struct User u)
         if (accountExistsForUser(u.name, r.accountNbr))
         {
             printf("✖ This Account already exists for this user\n");
+            printf("\nPress enter to retry.\n");
+            clear();
             getchar();
             continue;
         }
 
-        // Save new record
         r.id = getNextRecordId();
         saveRecord(u, r);
-        success(u);
         break;
     }
+    printf("\nSuccess, Press enter to return.\n");
+    clear();
+    getchar();
 }

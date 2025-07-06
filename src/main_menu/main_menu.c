@@ -47,6 +47,5 @@ void mainMenu(struct User u)
         break;
     }
     
-    sleep(2);
     mainMenu(u);
 };

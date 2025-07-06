@@ -28,7 +28,8 @@ void checkAllAccounts(struct User u)
     }
     fclose(pf);
 
-    printf("\n\nPress any key to continue...\n");
+    clear();
+    printf("\nPress enter to return\n");
     getchar();
-    success(u);
+    mainMenu(u);
 }
